@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <title>Lottery Application</title>
+  </head>
+  <body>
+    <form action="/lottery/participant" method="post">
+        <div>
+            <label for="name">Имя:</label><br>
+            <input type="text" id="name" name="name"><br>
+            <label for="age">Возраст:</label><br>
+            <input type="number" id="age" name="age"><br>
+            <label for="town">Город:</label><br>
+            <input type="text" id="town" name="town">
+            <input type="submit" value="Добавить">
+        </div><br>
+    </form>
+
+    <form action="/lottery/participant" method="get">
+        <input type="submit" value="Список участников"><br><br>
+    </form>
+
+    <form action="/lottery/start" method="get">
+        <input type="submit" value="Запуск лотерии"><br><br>
+    </form>
+
+    <form action="/lottery/winners" method="get">
+        <input type="submit" value="Список победителей"><br><br>
+    </form>
+
+  </body>
+</html>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="SSafarov" id="1">
+
+        <createSequence sequenceName="participant_id_seq" startValue="50" incrementBy="1" cycle="false"/>
+        <createTable tableName="participant">
+            <column name="id" type="BIGINT" defaultValueSequenceNext="participant_id_seq">
+                <constraints primaryKey="true" primaryKeyName="participant_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR2(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="age" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="town" type="VARCHAR2(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createSequence sequenceName="winners_id_seq" startValue="50" incrementBy="1" cycle="false"/>
+        <createTable tableName="winners">
+            <column name="id" type="BIGINT" defaultValueSequenceNext="winners_id_seq">
+                <constraints primaryKey="true" primaryKeyName="winners_pkey"/>
+            </column>
+            <column name="player_name" type="VARCHAR2(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="player_age" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="player_town" type="VARCHAR2(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="win_amount" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
