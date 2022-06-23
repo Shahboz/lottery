@@ -26,14 +26,22 @@ public class LotteryService {
         this.winnerRepository = winnerRepository;
     }
 
-    public String addParticipant(String name, Integer age, String town) {
+    public List<Participant> getAllParticipants() {
+        return participantRepository.findAllBy();
+    }
+
+    public List<Winner> getWinners() {
+        return winnerRepository.findAllBy();
+    }
+
+    public String addParticipant(String name, Integer age, String town) throws EmptyParticipantException {
         String result;
         if (StringUtils.isEmpty(name)) {
-            result = "Не указано имя игрока!";
+            throw new EmptyParticipantException("Не указано имя игрока!");
         } else if (age == null || age < 0) {
-            result = "Некорректный возраст игрока!";
+            throw new EmptyParticipantException("Некорректный возраст игрока!");
         } else if (StringUtils.isEmpty(town)) {
-            result = "Не указан город участника!";
+            throw new EmptyParticipantException("Не указан город участника!");
         } else {
             Participant participant = participantRepository.findParticipantByName(name);
             if (participant == null) {
@@ -51,21 +59,13 @@ public class LotteryService {
                 result = "Игрок обновлен!";
 
             } else {
-                result = "Игрок уже участвует в игре!";
+                throw new EmptyParticipantException("Игрок уже участвует в игре!");
             }
         }
         return result;
     }
 
-    public List<Participant> getAllParticipants() {
-        return participantRepository.findAllBy();
-    }
-
-    public List<Winner> getWinners() {
-        return winnerRepository.findAllBy();
-    }
-
-    private Integer getRandomValue(Integer minValue, Integer maxValue) {
+    public Integer getRandomValue(Integer minValue, Integer maxValue) {
         String requestUrl = "https://www.random.org/integers/" +
                 "?num=1" +
                 "&min="  + minValue +

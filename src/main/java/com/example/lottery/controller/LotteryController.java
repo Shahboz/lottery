@@ -23,7 +23,7 @@ public class LotteryController {
 
     @PostMapping("/participant")
     @ResponseBody
-    public String addParticipant(String name, Integer age, String town) {
+    public String addParticipant(String name, Integer age, String town) throws EmptyParticipantException {
         return lotteryService.addParticipant(name, age, town);
     }
 
