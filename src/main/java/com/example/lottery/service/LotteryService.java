@@ -1,7 +1,8 @@
 package com.example.lottery.service;
 
-import com.example.lottery.dto.ParticipantRepository;
-import com.example.lottery.dto.WinnerRepository;
+import com.example.lottery.dto.PlayerDto;
+import com.example.lottery.repository.ParticipantRepository;
+import com.example.lottery.repository.WinnerRepository;
 import com.example.lottery.entity.Participant;
 import com.example.lottery.entity.Winner;
 import com.example.lottery.exception.EmptyParticipantException;
@@ -34,33 +35,35 @@ public class LotteryService {
         return winnerRepository.findAllBy();
     }
 
-    public String addParticipant(String name, Integer age, String town) throws EmptyParticipantException {
-        String result;
-        if (StringUtils.isEmpty(name)) {
+    public String addParticipant(PlayerDto player) throws EmptyParticipantException {
+        // Проверки
+        if (StringUtils.isEmpty(player.getName())) {
             throw new EmptyParticipantException("Не указано имя игрока!");
-        } else if (age == null || age < 0) {
+        }
+        if (player.getAge() == null || player.getAge() < 0) {
             throw new EmptyParticipantException("Некорректный возраст игрока!");
-        } else if (StringUtils.isEmpty(town)) {
+        }
+        if (StringUtils.isEmpty(player.getTown())) {
             throw new EmptyParticipantException("Не указан город участника!");
+        }
+        String result;
+        Participant participant = participantRepository.findParticipantByName(player.getName());
+        if (participant == null) {
+            participant = new Participant();
+            participant.setName(player.getName());
+            participant.setAge(player.getAge());
+            participant.setTown(player.getTown());
+            participantRepository.save(participant);
+            result = "Игрок добавлен!";
+
+        } else if (participant.getAge() != player.getAge() || !participant.getTown().equals(player.getTown())) {
+            participant.setAge(player.getAge());
+            participant.setTown(player.getTown());
+            participantRepository.save(participant);
+            result = "Игрок обновлен!";
+
         } else {
-            Participant participant = participantRepository.findParticipantByName(name);
-            if (participant == null) {
-                participant = new Participant();
-                participant.setName(name);
-                participant.setAge(age);
-                participant.setTown(town);
-                participantRepository.save(participant);
-                result = "Игрок добавлен!";
-
-            } else if (participant.getAge() != age || !participant.getTown().equals(town)) {
-                participant.setAge(age);
-                participant.setTown(town);
-                participantRepository.save(participant);
-                result = "Игрок обновлен!";
-
-            } else {
-                throw new EmptyParticipantException("Игрок уже участвует в игре!");
-            }
+            result = "Игрок уже участвует в игре!";
         }
         return result;
     }

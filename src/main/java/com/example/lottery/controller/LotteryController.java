@@ -1,5 +1,6 @@
 package com.example.lottery.controller;
 
+import com.example.lottery.dto.PlayerDto;
 import com.example.lottery.entity.Participant;
 import com.example.lottery.entity.Winner;
 import com.example.lottery.exception.EmptyParticipantException;
@@ -23,8 +24,8 @@ public class LotteryController {
 
     @PostMapping("/participant")
     @ResponseBody
-    public String addParticipant(String name, Integer age, String town) throws EmptyParticipantException {
-        return lotteryService.addParticipant(name, age, town);
+    public String addParticipant(PlayerDto playerDto) throws EmptyParticipantException {
+        return lotteryService.addParticipant(playerDto);
     }
 
     @GetMapping("/participant")

@@ -1,4 +1,4 @@
-package com.example.lottery.dto;
+package com.example.lottery.repository;
 
 import com.example.lottery.entity.Winner;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,16 +1,13 @@
 package com.example.lottery.controller;
 
-import com.example.lottery.dto.ParticipantRepository;
-import com.example.lottery.dto.WinnerRepository;
+import com.example.lottery.repository.ParticipantRepository;
+import com.example.lottery.repository.WinnerRepository;
 import com.example.lottery.entity.Participant;
 import com.example.lottery.entity.Winner;
 import com.example.lottery.exception.EmptyParticipantException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,11 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -40,14 +34,11 @@ class LotteryControllerTest {
 
     private Participant participant;
     private Winner winner;
-    private String playerJson;
 
     @MockBean
     private ParticipantRepository participantRepository;
     @MockBean
     private WinnerRepository winnerRepository;
-    @Mock
-    private RestTemplate restTemplate;
 
     @Autowired
     LotteryControllerTest(MockMvc mockMvc) {
@@ -55,22 +46,20 @@ class LotteryControllerTest {
     }
 
     @BeforeEach
-    void setUp() throws JsonProcessingException {
+    void setUp() {
         participant = new Participant();
         participant.setId(1);
-        participant.setName("Player 1");
+        participant.setName("PlayerDto 1");
         participant.setAge(20);
         participant.setTown("Town 1");
 
         winner = new Winner(participant, 50);
-        playerJson = new ObjectMapper().writer().withDefaultPrettyPrinter().writeValueAsString(winner);
     }
 
     @AfterEach
     void tearDown() {
         participant = null;
         winner = null;
-        playerJson = null;
     }
 
     @Test
@@ -138,12 +127,13 @@ class LotteryControllerTest {
         Mockito.doReturn(2).when(participantRepository).findMaxId();
         Mockito.doReturn(participant).when(participantRepository).getOne(Mockito.any(Integer.class));
         Mockito.doReturn(winner).when(winnerRepository).save(Mockito.any(Winner.class));
-        Mockito.when(restTemplate.getForObject("https://www.random.org/*", String.class)).thenReturn(winner.getWinAmount().toString());
 
         mockMvc.perform(get("/lottery/start"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().string(equalTo(playerJson)));
+                .andExpect(content().string(containsString(winner.getPlayerName())))
+                .andExpect(content().string(containsString(winner.getPlayerAge().toString())))
+                .andExpect(content().string(containsString(winner.getPlayerTown())));
 
         Mockito.verify(participantRepository, Mockito.times(1)).deleteAll();
         Mockito.verify(winnerRepository, Mockito.times(1)).save(Mockito.any(Winner.class));

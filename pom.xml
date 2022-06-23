@@ -18,6 +18,8 @@
 
 	<properties>
 		<java.version>15</java.version>
+		<hibernate.version>5.4.3.Final</hibernate.version>
+		<liquibase.version>3.4.1</liquibase.version>
 	</properties>
 
 	<dependencies>
@@ -25,7 +27,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
-			<version>2.3.10.RELEASE</version>
 		</dependency>
 
 		<dependency>
@@ -55,15 +56,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>5.4.3.Final</version>
+			<version>${hibernate.version}</version>
 		</dependency>
 
 		<dependency>
@@ -72,9 +67,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.11.4</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
@@ -97,7 +92,7 @@
 			<plugin>
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-maven-plugin</artifactId>
-				<version>3.4.1</version>
+				<version>${liquibase.version}</version>
 				<configuration>
 					<propertyFile>src/main/resources/liquibase.properties</propertyFile>
 				</configuration>
