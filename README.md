@@ -18,3 +18,7 @@ Alternatively you can use the [Spring Boot Maven plugin](https://docs.spring.io/
 
 ```shell
 mvn spring-boot:run
+```
+## Swagger UI
+
+[http://localhost:8080/swagger-ui/](http://localhost:8080/swagger-ui/)

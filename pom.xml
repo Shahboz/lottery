@@ -19,7 +19,6 @@
 	<properties>
 		<java.version>15</java.version>
 		<hibernate.version>5.4.3.Final</hibernate.version>
-		<liquibase.version>3.4.1</liquibase.version>
 	</properties>
 
 	<dependencies>
@@ -37,6 +36,18 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-boot-starter</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>3.0.0</version>
 		</dependency>
 
 		<dependency>

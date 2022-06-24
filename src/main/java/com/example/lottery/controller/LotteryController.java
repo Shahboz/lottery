@@ -3,14 +3,17 @@ package com.example.lottery.controller;
 import com.example.lottery.dto.PlayerDto;
 import com.example.lottery.entity.Participant;
 import com.example.lottery.entity.Winner;
-import com.example.lottery.exception.EmptyParticipantException;
+import com.example.lottery.exception.ValidationException;
 import com.example.lottery.service.LotteryService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
+@Slf4j
 @Controller
 @RequestMapping("/lottery")
 public class LotteryController {
@@ -24,7 +27,8 @@ public class LotteryController {
 
     @PostMapping("/participant")
     @ResponseBody
-    public String addParticipant(PlayerDto playerDto) throws EmptyParticipantException {
+    @ResponseStatus(HttpStatus.CREATED)
+    public String addParticipant(@RequestBody PlayerDto playerDto) throws ValidationException {
         return lotteryService.addParticipant(playerDto);
     }
 
@@ -36,7 +40,7 @@ public class LotteryController {
 
     @GetMapping("/start")
     @ResponseBody
-    public Winner start() throws EmptyParticipantException {
+    public Winner start() throws ValidationException {
         return lotteryService.start();
     }
 
@@ -46,9 +50,11 @@ public class LotteryController {
         return lotteryService.getWinners();
     }
 
-    @ExceptionHandler(EmptyParticipantException.class)
+    @ExceptionHandler(ValidationException.class)
     @ResponseBody
-    public String handleException(EmptyParticipantException exception) {
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleException(ValidationException exception) {
+        log.error("Ошибка валидации данных", exception);
         return exception.getMessage();
     }
 

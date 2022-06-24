@@ -1,11 +1,12 @@
 package com.example.lottery.controller;
 
-import com.example.lottery.repository.ParticipantRepository;
-import com.example.lottery.repository.WinnerRepository;
 import com.example.lottery.entity.Participant;
 import com.example.lottery.entity.Winner;
-import com.example.lottery.exception.EmptyParticipantException;
+import com.example.lottery.exception.ValidationException;
+import com.example.lottery.repository.ParticipantRepository;
+import com.example.lottery.repository.WinnerRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -13,14 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import java.util.ArrayList;
 import java.util.List;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -64,16 +64,13 @@ class LotteryControllerTest {
 
     @Test
     void addParticipantSuccess() throws Exception {
-        MultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-        requestParams.add("name", participant.getName());
-        requestParams.add("age", participant.getAge().toString());
-        requestParams.add("town", participant.getTown());
 
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/lottery/participant")
-                .params(requestParams))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\": \"" + participant.getName() + "\", \"age\":" + participant.getAge() + ", \"town\": \"" + participant.getTown() + "\"}"))
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().string(containsString("Игрок добавлен")));
 
         Mockito.verify(participantRepository, Mockito.times(1)).save(Mockito.any(Participant.class));
@@ -82,16 +79,16 @@ class LotteryControllerTest {
 
     @Test
     void addParticipantFailure() throws Exception {
-        MultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-        requestParams.add("name", participant.getName());
 
         mockMvc.perform(MockMvcRequestBuilders
                 .post("/lottery/participant")
-                .params(requestParams))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\": \"" + participant.getName() + "\"}"))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(mvcResult -> assertTrue(mvcResult.getResolvedException() instanceof EmptyParticipantException))
-                .andExpect(mvcResult -> assertNotNull(mvcResult.getResolvedException().getMessage()));
+                .andExpect(status().isBadRequest())
+                .andExpect(mvcResult -> Assertions.assertTrue(mvcResult.getResolvedException() instanceof ValidationException))
+                .andExpect(mvcResult -> Assertions.assertNotNull(mvcResult.getResolvedException()))
+                .andExpect(mvcResult -> Assertions.assertNotNull(mvcResult.getResolvedException().getMessage()));
 
         Mockito.verify(participantRepository, Mockito.times(0)).save(Mockito.any(Participant.class));
         Mockito.verify(winnerRepository, Mockito.times(0)).save(Mockito.any(Winner.class));
@@ -131,9 +128,10 @@ class LotteryControllerTest {
         mockMvc.perform(get("/lottery/start"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString(winner.getPlayerName())))
-                .andExpect(content().string(containsString(winner.getPlayerAge().toString())))
-                .andExpect(content().string(containsString(winner.getPlayerTown())));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.playerName").value(winner.getPlayerName()))
+                .andExpect(jsonPath("$.playerAge").value(winner.getPlayerAge()))
+                .andExpect(jsonPath("$.playerTown").value(winner.getPlayerTown()));
 
         Mockito.verify(participantRepository, Mockito.times(1)).deleteAll();
         Mockito.verify(winnerRepository, Mockito.times(1)).save(Mockito.any(Winner.class));
@@ -145,10 +143,10 @@ class LotteryControllerTest {
 
         mockMvc.perform(get("/lottery/start"))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(mvcResult -> assertTrue(mvcResult.getResolvedException() instanceof EmptyParticipantException))
-                .andExpect(mvcResult -> assertNotNull(mvcResult.getResolvedException().getMessage()));
-
+                .andExpect(status().isBadRequest())
+                .andExpect(mvcResult -> Assertions.assertTrue(mvcResult.getResolvedException() instanceof ValidationException))
+                .andExpect(mvcResult -> Assertions.assertNotNull(mvcResult.getResolvedException()))
+                .andExpect(mvcResult -> Assertions.assertNotNull(mvcResult.getResolvedException().getMessage()));
 
         Mockito.verify(participantRepository, Mockito.times(0)).save(Mockito.any(Participant.class));
         Mockito.verify(winnerRepository, Mockito.times(0)).save(Mockito.any(Winner.class));
